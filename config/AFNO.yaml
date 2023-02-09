@@ -33,13 +33,13 @@ full_field: &FULL_FIELD
   in_channels: [0,1]
   out_channels: [0,1] #must be same as in_channels if prediction_type == 'iterative'
   normalization: 'zscore' #options zscore (minmax not supported) 
-  train_data_path: '/pscratch/sd/j/jpathak/wind/train'
-  valid_data_path: '/pscratch/sd/j/jpathak/wind/test'
-  inf_data_path: '/pscratch/sd/j/jpathak/wind/out_of_sample' # test set path for inference
-  exp_dir: '/pscratch/sd/j/jpathak/ERA5_expts_gtc/wind'
-  time_means_path:   '/pscratch/sd/j/jpathak/wind/time_means.npy'
-  global_means_path: '/pscratch/sd/j/jpathak/wind/global_means.npy'
-  global_stds_path:  '/pscratch/sd/j/jpathak/wind/global_stds.npy'
+  train_data_path: '/scratch/f1000/dealmeih/ds/FCN/FCN_ERA5_data_v0train'
+  valid_data_path: '/scratch/f1000/dealmeih/ds/FCN/FCN_ERA5_data_v0test'
+  inf_data_path: '/scratch/f1000/dealmeih/ds/FCN/FCN_ERA5_data_v0out_of_sample' # test set path for inference
+  exp_dir: '/scratch/f1000/dealmeih/ds/FCN/FCN_ERA5_data_v0'
+  time_means_path:   '/scratch/f1000/dealmeih/ds/FCN/FCN_ERA5_data_v0time_means.npy'
+  global_means_path: '/scratch/f1000/dealmeih/ds/FCN/FCN_ERA5_data_v0global_means.npy'
+  global_stds_path:  '/scratch/f1000/dealmeih/ds/FCN/FCN_ERA5_data_v0global_stds.npy'
 
   orography: !!bool False
   orography_path: None
@@ -61,27 +61,32 @@ full_field: &FULL_FIELD
 
 afno_backbone: &backbone
   <<: *FULL_FIELD
-  log_to_wandb: !!bool True
+  log_to_screen: !!bool True
+  log_to_wandb: !!bool False
   lr: 5E-4
-  batch_size: 64
-  max_epochs: 150
+  batch_size: 48
+  max_epochs: 2
   scheduler: 'CosineAnnealingLR'
   in_channels: [0, 1 ,2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
   out_channels: [0, 1 ,2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
   orography: !!bool False
   orography_path: None 
-  exp_dir: '/pscratch/sd/s/shas1693/results/era5_wind'
-  train_data_path: '/pscratch/sd/s/shas1693/data/era5/train'
-  valid_data_path: '/pscratch/sd/s/shas1693/data/era5/test'
-  inf_data_path:   '/pscratch/sd/s/shas1693/data/era5/out_of_sample'
-  time_means_path:   '/pscratch/sd/s/shas1693/data/era5/time_means.npy'
-  global_means_path: '/pscratch/sd/s/shas1693/data/era5/global_means.npy'
-  global_stds_path:  '/pscratch/sd/s/shas1693/data/era5/global_stds.npy'
+  exp_dir: '/scratch/f1000/dealmeih/results/era5_wind'
+  train_data_path: '/scratch/f1000/dealmeih/ds/FCN/FCN_ERA5_data_v0/train'
+  valid_data_path: '/scratch/f1000/dealmeih/ds/FCN/FCN_ERA5_data_v0/test'
+  inf_data_path:   '/scratch/f1000/dealmeih/ds/FCN/FCN_ERA5_data_v0/out_of_sample'
+  time_means_path:   '/scratch/f1000/dealmeih/ds/FCN/FCN_ERA5_data_v0/time_means.npy'
+  global_means_path: '/scratch/f1000/dealmeih/ds/FCN/FCN_ERA5_data_v0/global_means.npy'
+  global_stds_path:  '/scratch/f1000/dealmeih/ds/FCN/FCN_ERA5_data_v0/global_stds.npy'
+  two_step_training: !!bool False
+  plot_animations: !!bool True
+  resuming: !!bool False
+  pretrained: !!bool False
 
 afno_backbone_orography: &backbone_orography 
   <<: *backbone
   orography: !!bool True
-  orography_path: '/pscratch/sd/s/shas1693/data/era5/static/orography.h5'
+  orography_path: '/scratch/f1000/dealmeih/ds/FCN/FCN_ERA5_data_v0/static/orography.h5'
 
 afno_backbone_finetune: 
   <<: *backbone
@@ -91,7 +96,7 @@ afno_backbone_finetune:
   max_epochs: 50
   pretrained: !!bool True
   two_step_training: !!bool True
-  pretrained_ckpt_path: '/pscratch/sd/s/shas1693/results/era5_wind/afno_backbone/0/training_checkpoints/best_ckpt.tar'
+  pretrained_ckpt_path: '/scratch/f1000/dealmeih/results/era5_wind/afno_backbone/0/training_checkpoints/best_ckpt.tar'
 
 perturbations:
   <<: *backbone
@@ -100,7 +105,7 @@ perturbations:
   max_epochs: 50
   pretrained: !!bool True
   two_step_training: !!bool True
-  pretrained_ckpt_path: '/pscratch/sd/j/jpathak/ERA5_expts_gtc/wind/afno_20ch_bs_64_lr5em4_blk_8_patch_8_cosine_sched/1/training_checkpoints/best_ckpt.tar'
+  pretrained_ckpt_path: '/scratch/f1000/dealmeih/ds/FCN/FCN_ERA5_data_v0/afno_20ch_bs_64_lr5em4_blk_8_patch_8_cosine_sched/1/training_checkpoints/best_ckpt.tar'
   prediction_length: 24
   ics_type: "datetime"
   n_perturbations: 100 
@@ -109,7 +114,7 @@ perturbations:
   save_raw_forecasts: !!bool False
   date_strings: ["2018-01-01 00:00:00"] 
   inference_file_tag: " "
-  valid_data_path: "/pscratch/sd/j/jpathak/ "
+  valid_data_path: "/scratch/f1000/dealmeih/ds/FCN/FCN_ERA5_data_v0/ "
   perturb: !!bool True
   n_level: 0.3
 
@@ -124,8 +129,8 @@ precip: &precip
   lr: 2.5E-4
   batch_size: 64
   max_epochs: 25
-  precip: '/pscratch/sd/p/pharring/ERA5/precip/total_precipitation'
-  time_means_path_tp: '/pscratch/sd/p/pharring/ERA5/precip/total_precipitation/time_means.npy'
-  model_wind_path: '/pscratch/sd/s/shas1693/results/era5_wind/afno_backbone_finetune/0/training_checkpoints/best_ckpt.tar'
+  precip: '/scratch/f1000/dealmeih/ds/FCN/FCN_ERA5_data_v0/precip/total_precipitation'
+  time_means_path_tp: '/scratch/f1000/dealmeih/ds/FCN/FCN_ERA5_data_v0/precip/total_precipitation/time_means.npy'
+  model_wind_path: '/scratch/f1000/dealmeih/results/era5_wind/afno_backbone_finetune/0/training_checkpoints/best_ckpt.tar'
   precip_eps: !!float 1e-5
 

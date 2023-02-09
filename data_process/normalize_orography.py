@@ -47,7 +47,7 @@
 import h5py
 import numpy as np
 
-with h5py.File('/pscratch/sd/s/shas1693/data/era5/static/orography.h5','a') as f:
+with h5py.File('/scratch/f1000/dealmeih/ds/FCN/FCN_ERA5_data_v0/static/orography.h5','a') as f:
     
     orog = f['orog'][:]
     omean = np.mean(orog)

@@ -1,20 +1,12 @@
 #!/bin/bash
 
-set -x
-
-#module load cray cray-hdf5-parallel
-
 #shifter --image=nersc/pytorch:ngc-21.08-v1 --env PYTHONUSERBASE=/scratch/f1000/dealmeih/perlmutter/ngc-21.08-v1 python \
 #  train.py --enable_amp --config pretrained_two_step_afno_20ch_bs_64_lr1em4_blk_8_patch_8_cosine_sched --run_num test0 
 export MASTER_ADDR=$(hostname)
-image=nersc/pytorch:ngc-22.09-v0
-# image=nvcr.io/nvidia/pytorch:22.02-py3
+# image=nersc/pytorch:ngc-22.02-v0
 ngpu=4
 config_file=./config/AFNO.yaml
 config="afno_backbone"
 run_num="check"
 cmd="python train.py --enable_amp --yaml_config=$config_file --config=$config --run_num=$run_num"
-srun -ul -n $ngpu --cpus-per-task=32 --gpus-per-node $ngpu sarus run -w $(pwd) \
-  --mount=type=bind,source=$HOME,destination=$HOME \
-  --mount=type=bind,source=$SCRATCH,destination=$SCRATCH \
-   ${image} bash -c "source export_DDP_vars.sh && $cmd"
+srun -ul -n $ngpu --cpus-per-task=32 --gpus-per-node $ngpu bash -c "source export_DDP_vars.sh && $cmd"
