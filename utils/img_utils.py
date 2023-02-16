@@ -84,15 +84,13 @@ def reshape_fields(img, inp_or_tar, crop_size_x, crop_size_y,rnd_x, rnd_y, param
     if len(np.shape(img)) ==3:
       img = np.expand_dims(img, 0)
 
-    
-    img = img[:, :, 0:720] #remove last pixel
+    if params.era5:
+        img = img[:, :, 0:720] #remove last pixel
     n_history = np.shape(img)[0] - 1
     img_shape_x = np.shape(img)[-2]
     img_shape_y = np.shape(img)[-1]
     n_channels = np.shape(img)[1] #this will either be N_in_channels or N_out_channels
     channels = params.in_channels if inp_or_tar =='inp' else params.out_channels
-    means = np.load(params.global_means_path)[:, channels]
-    stds = np.load(params.global_stds_path)[:, channels]
     if crop_size_x == None:
         crop_size_x = img_shape_x
     if crop_size_y == None:
@@ -102,6 +100,8 @@ def reshape_fields(img, inp_or_tar, crop_size_x, crop_size_y,rnd_x, rnd_y, param
         if params.normalization == 'minmax':
           raise Exception("minmax not supported. Use zscore")
         elif params.normalization == 'zscore':
+          means = np.load(params.global_means_path)[:, channels]
+          stds = np.load(params.global_stds_path)[:, channels]
           img -=means
           img /=stds
 
