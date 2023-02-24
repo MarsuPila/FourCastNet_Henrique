@@ -17,7 +17,7 @@ class Params():
     two_step_training = True
     orography = False
     add_noise = False
-    normalize = True
+    normalize = False
     global_means_path = None #'/scratch/f1000/dealmeih/ds/FCN/FCN_ERA5_data_v0/global_means.npy'
     global_stds_path  = None #'/scratch/f1000/dealmeih/ds/FCN/FCN_ERA5_data_v0/global_stds.npy'
     add_grid = False
@@ -30,9 +30,10 @@ if __name__ == "__main__":
     params = Params()
     if sys.argv[1] == 'cosmo':
         params.era5 = False
-        if params.normalize:
-            params.global_means_path = os.path.join(str(sys.argv[2]), 'global_means.npy')
-            params.global_stds_path  = os.path.join(str(sys.argv[2]), 'global_stds.npy')
+        if len(sys.argv)>3:
+            params.noramlize = True
+            params.global_means_path = os.path.join(str(sys.argv[3]), 'global_means.npy')
+            params.global_stds_path  = os.path.join(str(sys.argv[3]), 'global_stds.npy')
         dataset = GetCosmoDataset(params, str(sys.argv[2]), train=False)
     else: # era5
         params.era5 = True
