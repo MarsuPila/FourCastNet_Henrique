@@ -127,6 +127,8 @@ class GetCosmoDataset(Dataset):
       self.files_paths += glob.glob(day + '/*.nc')
     self.files_paths.sort()
     self.n_samples_total = len(self.files_paths) - self.n_history - 1
+    if self.params.two_step_training:
+        self.n_samples_total -= 1
 
     with ncDataset(self.files_paths[0], 'r') as _f:
       logging.info("Getting file stats from {}".format(self.files_paths[0]))
