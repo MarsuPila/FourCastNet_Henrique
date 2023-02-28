@@ -130,17 +130,19 @@ class GetCosmoDataset(Dataset):
     if self.params.two_step_training:
         self.n_samples_total -= 1
 
-    with ncDataset(self.files_paths[0], 'r') as _f:
-      logging.info("Getting file stats from {}".format(self.files_paths[0]))
-      self.img_shape_x = _f[self.in_channels[0]].shape[-1]
-      self.img_shape_y = _f[self.in_channels[0]].shape[-2]
+    #with ncDataset(self.files_paths[0], 'r') as _f:
+    _f = ncDataset(self.files_paths[0], 'r')
+    logging.info("Getting file stats from {}".format(self.files_paths[0]))
+    self.img_shape_x = _f[self.in_channels[0]].shape[-1]
+    self.img_shape_y = _f[self.in_channels[0]].shape[-2]
 
-      # check if all vars are present in data
-      for var in self.in_channels:
-        if not var in _f.variables:
-          raise ValueError(f'variable {var} not in data set.')
-        self.n_in_channels += _f[var].shape[-3]
+    # check if all vars are present in data
+    for var in self.in_channels:
+      if not var in _f.variables:
+        raise ValueError(f'variable {var} not in data set.')
+      self.n_in_channels += _f[var].shape[-3]
 
+    _f.close()
     self.files = [None for _ in range(self.n_samples_total)]
 
     logging.info("Found data at path {}. Number of examples: {}. Image Shape: {} x {} x {}".format(self.location, self.n_samples_total, self.n_in_channels, self.img_shape_x, self.img_shape_y))
