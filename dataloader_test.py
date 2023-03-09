@@ -48,7 +48,12 @@ if __name__ == "__main__":
     tstart = time.time()
     cntr = 0
     #for ii in range(0, len(dataset) ,2):
-    for ii in range(0, 100, 2):
+    total = 5
+
+    import random
+
+    for _ in range(0, total, 2):
+        ii = random.randint(0, len(dataset))
         dummy = dataset[ii][0].shape
         cntr += 2
         if ii%50==0:
