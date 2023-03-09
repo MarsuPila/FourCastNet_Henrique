@@ -60,6 +60,8 @@ from netCDF4 import Dataset as ncDataset
 import os.path
 
 
+logger = logging.getLogger(__name__)
+
 def get_data_loader(params, files_pattern, distributed, train, cosmo=False):
 
   if cosmo:
@@ -80,6 +82,20 @@ def get_data_loader(params, files_pattern, distributed, train, cosmo=False):
     return dataloader, dataset, sampler
   else:
     return dataloader, dataset
+
+
+def _open_small_netcdf(path):
+    """reading all variables from a netCDF 64-bit offset file is much faster if
+    the bytes are read into memory sequntially.
+
+    Reading many variables probably results in many seeks and other system
+    calls.
+    """
+    logger.debug(f"Loading {path}")
+    with open(path, "rb") as _f:
+        buffer = _f.read()
+    return ncDataset(path, 'r', bytes=buffer)
+
 
 class GetCosmoDataset(Dataset):
   def __init__(self, params, location, train):
@@ -151,7 +167,8 @@ class GetCosmoDataset(Dataset):
 
   def _open_file(self, idx):
     dat = []
-    with ncDataset(self.files_paths[idx], 'r') as _f:
+    path = self.files_paths[idx]
+    with _open_small_netcdf(path) as _f:
       for var in self.in_channels:
         arr = np.squeeze(_f[var][:])
         if len(arr.shape)<3:
