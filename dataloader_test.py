@@ -48,7 +48,7 @@ if __name__ == "__main__":
     tstart = time.time()
     cntr = 0
     #for ii in range(0, len(dataset) ,2):
-    total = 5
+    total = 50
 
     import random
 
@@ -56,8 +56,6 @@ if __name__ == "__main__":
         ii = random.randint(0, len(dataset))
         dummy = dataset[ii][0].shape
         cntr += 2
-        if ii%50==0:
-            print('{}MB allocated'.format(torch.cuda.memory_allocated()/1024**2))
     t_tot = time.time() - tstart
 
-    print(f'took {t_tot} to load {cntr} files')
+    print(f'took {t_tot} to load {cntr} files, hence bw is {cntr*39/t_tot}MB/s')
