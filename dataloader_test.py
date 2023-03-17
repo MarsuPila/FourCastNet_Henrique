@@ -6,6 +6,7 @@ logging_utils.config_logger()
 from utils.data_loader_multifiles import GetDataset, GetCosmoDataset
 import time
 import torch
+from tqdm import tqdm
 
 class Params():
     dt = 1
@@ -42,22 +43,41 @@ if __name__ == "__main__":
         params.in_channels = params.out_channels
         dataset = GetDataset(params, str(sys.argv[2]), train=False)
 
+    
+    from torch.utils.data import DataLoader
+    import random
+
+
+    samples = list(range(len(dataset)))
+    random.shuffle(samples)
+    samples = samples[:200]
+
+    dl = DataLoader(dataset, num_workers=8, batch_size=8, pin_memory=True, sampler=samples)
+
     print(len(dataset), torch.std_mean(dataset[0][0][35,:,:])) 
     print(dataset[0][0].shape, dataset[-1][1].shape)
 
     tstart = time.time()
     cntr = 0
     #for ii in range(0, len(dataset) ,2):
-    total = 5
+    total = 100
 
-    import random
 
-    for _ in range(0, total, 2):
-        ii = random.randint(0, len(dataset))
-        dummy = dataset[ii][0].shape
-        cntr += 2
-        if ii%50==0:
-            print('{}MB allocated'.format(torch.cuda.memory_allocated()/1024**2))
+    nbytes = 0
+    for x, y in tqdm(dl):
+        x = x.cuda()
+        y = y.cuda()
+
+        # a non trivial computation
+        
+        data = torch.sum(x*y)
+        out = data.cpu()
+        nbytes += x.numel() * 4
+        nbytes += y.numel() * 4
+
+    assert x.dtype == torch.float32
     t_tot = time.time() - tstart
 
-    print(f'took {t_tot} to load {cntr} files')
+
+    print(f'took {t_tot} to load {len(samples)} files')
+    print(f"Throughput", nbytes / 1e6 / t_tot, "MB/s")
