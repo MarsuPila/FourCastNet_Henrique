@@ -57,6 +57,7 @@ import math
 #import cv2
 from utils.img_utils import reshape_fields, reshape_precip
 from netCDF4 import Dataset as ncDataset
+import xarray as xr
 import os.path
 
 
@@ -165,17 +166,33 @@ class GetCosmoDataset(Dataset):
     logging.info("Delta t: {} hours".format(self.dt))
     logging.info("Including {} hours of past history in training at a frequency of {} hours".format(self.dt*self.n_history, self.dt))
 
+  # def _open_file(self, idx):
+  #   dat = []
+  #   path = self.files_paths[idx]
+  #   with _open_small_netcdf(path) as _f:
+  #     for var in self.in_channels:
+  #       arr = np.squeeze(_f[var][:])
+  #       if len(arr.shape)<3:
+  #         arr = arr[None,:]
+  #       dat.append(arr)
+  #   return np.concatenate(dat, axis=0)[None,:]
+
   def _open_file(self, idx):
     dat = []
     path = self.files_paths[idx]
     with _open_small_netcdf(path) as _f:
+      xrd = xr.open_dataset(xr.backends.NetCDF4DataStore(_f))
+      for field in ('U','T','V','FI','RELHUM'):
+          for k in range(1,xrd['T'].coords['z_1'].size):
+              xrd[field][dict(z_1=k)] = xrd[field][dict(z_1=k)].fillna(xrd[field][dict(z_1=k-1)] * xrd[field][dict(z_1=k)].mean()/xrd[field][dict(z_1=k-1)].mean())
+
       for var in self.in_channels:
-        arr = np.squeeze(_f[var][:])
+        arr = np.squeeze(xrd[var].to_numpy())
         if len(arr.shape)<3:
           arr = arr[None,:]
         dat.append(arr)
-    return np.concatenate(dat, axis=0)[None,:]
 
+    return np.concatenate(dat, axis=0)[None,:]
   
   def __len__(self):
     return self.n_samples_total

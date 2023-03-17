@@ -47,10 +47,11 @@ if __name__ == "__main__":
     from torch.utils.data import DataLoader
     import random
 
+    total = 200
 
     samples = list(range(len(dataset)))
     random.shuffle(samples)
-    samples = samples[:200]
+    samples = samples[:total]
 
     dl = DataLoader(dataset, num_workers=8, batch_size=8, pin_memory=True, sampler=samples)
 
@@ -59,9 +60,6 @@ if __name__ == "__main__":
 
     tstart = time.time()
     cntr = 0
-    #for ii in range(0, len(dataset) ,2):
-    total = 100
-
 
     nbytes = 0
     for x, y in tqdm(dl):
@@ -81,3 +79,4 @@ if __name__ == "__main__":
 
     print(f'took {t_tot} to load {len(samples)} files')
     print(f"Throughput", nbytes / 1e6 / t_tot, "MB/s")
+
