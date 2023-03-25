@@ -1,0 +1,13 @@
+name: fcn
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - numpy
+  - cudatoolkit-dev=11.6
+  - pytorch==1.13
+  - torchvision
+  - pytorch-cuda=11.6

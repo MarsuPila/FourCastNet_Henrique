@@ -1,0 +1,11 @@
+cupy-cuda116
+h5py
+zarr
+ruamel.yaml
+matplotlib
+netcdf4
+xarray
+timm
+einops
+wandb
+scipy

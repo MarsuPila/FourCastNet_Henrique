@@ -249,6 +249,7 @@ class Trainer():
     
     for i, data in enumerate(self.train_data_loader, 0):
       self.iters += 1
+      logging.info(f'step {i} of {len(self.train_data_loader)} in epoch {self.epoch} of {self.params.max_epochs}')
       # adjust_LR(optimizer, params, iters)
       data_start = time.time()
       inp, tar = map(lambda x: x.to(self.device, dtype = torch.float), data)      
